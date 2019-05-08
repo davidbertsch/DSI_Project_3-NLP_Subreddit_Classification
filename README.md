@@ -1,171 +1,58 @@
-# ![](https://ga-dash.s3.amazonaws.com/production/assets/logo-9f88ae6c9c3871690e33280fcf557f33.png) Project 3: Web APIs & Classification
+# Project 3
 
-### Description
+## Executive Summary
 
-In week four we've learned about a few different classifiers. In week five we'll learn about webscraping, APIs, and Natural Language Processing (NLP). Now we're going to put those skills to the test.
+In this project, I built a model to classify the subreddit of origin of posts to the Grateful Dead subreddit and the Phish subreddit. These are fan forums for fans of the bands. These fanbases are often linked together because both bands have a similar atistic approach that is distinct from most music in that they emphasize the live concert performance vs. recording studio albums. 
 
-For project 3, your goal is two-fold:
-1. Using Reddit's API, you'll collect posts from two subreddits of your choosing.
-2. You'll then use NLP to train a classifier on which subreddit a given post came from. This is a binary classification problem.
+The bands are from different periods. The Grateful Dead rose to prominence in the 60s as part of the countercultural movement in San Francisco. They pioneered a style of playing unique concerts that consisted largely of improvization. As a result of their concerts being different from one another, they attracted fans that became obsessive followers to the point that some fans would actually "tour" with the band. These fans are colloquially known as "Deadheads". Phish - despite having very different musical influences and style - followed the Grateful Dead's model for making their concerts distinct from one another and emphasizing the improvization in their performance. They formed in 1983 as college students, and rapidly built a diehard fanbase.
 
+Many fans of Phish are fans of the Grateful Dead, and vice-versa. Both fanbases are also early pioneers of internet message boards. The message boards are used for things like discussing concerts, favorite versions of songs, ticket trading/selling, etc. I thought these two subreddits would make for an interesting NLP analysis, because both fanbases would be discussing very similar things.
 
-#### About the API
+### Hypotheses
 
-Reddit's API is fairly straightforward. For example, if I want the posts from [`/r/boardgames`](https://www.reddit.com/r/boardgames), all I have to do is add `.json` to the end of the url: https://www.reddit.com/r/boardgames.json
+Before doing any data collection, I had a few ideas on how an NLP classification model might perform.
 
-To help you get started, we have a primer video on how to use Reddit's API: https://www.youtube.com/watch?v=5Y3ZE26Ciuk
+1. I thought it would be fairly straightforward to build an accurate model. This was based on the idea that there would be a lot of band-specific terminology that would recur. This would be words like band member names, song titles, album titles, or years during which the bands did not overlap. I figured that most posts to these subreddits would contain at least some of this kind of terminology.
 
----
+2. I thought that a model would have a hard time with classifying vague posts. I figured that there would be a certain amount of posts that wouldn't explicitly refer to either band.
 
-### Requirements
+3. I thought that the model would have a challenge with classifying "crossover" posts where one band is being discussed in the other band's subreddit. Since there are many fans of both bands, I know that this kind of discussion does occur fairly often.
 
-- Gather and prepare your data using the `requests` library.
-- **Create and compare two models**. One of these must be a Bayes classifier, however the other can be a classifier of your choosing: logistic regression, KNN, SVM, etc.
-- A Jupyter Notebook with your analysis for a peer audience of data scientists.
-- An executive summary of the results you found.
-- A short presentation outlining your process and findings for a semi-technical audience.
+### Modeling
 
-**Pro Tip 1:** You can find a good example executive summary [here](https://www.proposify.biz/blog/executive-summary).
+I tried out the following models in my analysis:
 
-**Pro Tip 2:** Reddit will give you 25 posts **per request**. To get enough data, you'll need to hit Reddit's API **repeatedly** (most likely in a `for` loop). _Be sure to use the `time.sleep()` function at the end of your loop to allow for a break in between requests. **THIS IS CRUCIAL**_
+- Logistic Regression with Count Vectorization
+- Naive Bayes with Count Vectorization
+- Logistic Regression with TF-IDF Vectorization
+- Naive Bayes with TF-IDF Vectorization
+- Support Vector Machines with Count Vectorization
+- Random Forests with Count Vectorization
+- Support Vector Machines with TF-IDF Vectorization
+- Random Forests with TF-IDF Vectorization
 
-**Pro tip 3:** The API will cap you at 1,000 posts for each subreddit (assuming the subreddit has that many posts).
+All of the models performed fairly accurately, and they all had a fair amount of variance. 
 
-**Pro tip 4:** At the end of each loop, be sure to save the results from your scrape as a `csv`: JSON from Reddit > Pandas DataFrame > CSV. That way, if something goes wrong in your loop, you won't lose all your data.
+The logistic regression models and the Naive Bayes models had the highest accuracy by a small margin, but the highest variance by a significant margin (~90% testing accuracy/~99% training accuracy). 
 
----
+The random forests models reduced the variance, but had the highest bias by a substantial margin (~90% testing accuracy/~85% training accuracy).
 
-### Necessary Deliverables / Submission
+The support vector machines model with TF-IDF vectorization was my preferred model. It had the lowest variance, and it's testing accuracy was close enough to the best performing logistic regression/Naive Bayes models. This model was 90% accurate on testing data classification and 94% accurate on training data classification.
 
-- Code and executive summary must be in a clearly commented Jupyter Notebook.
-- You must submit your slide deck.
-- Materials must be submitted by **10:00 AM on Monday, April 8th**.
+### Conclusions
 
----
+This was an interesting exercise in testing out a variety of different NLP models. I think the performance of my models was generally quite good, but I'm sure it could be better. 
 
-## Rubric
-Your local instructor will evaluate your project (for the most part) using the following criteria.  You should make sure that you consider and/or follow most if not all of the considerations/recommendations outlined below **while** working through your project.
+Overall, my hypotheses proved to be correct in how the models would likely be accurate, but that they would be susceptible to misclassifications on certain types of posts.
 
-For Project 3 the evaluation categories are as follows:<br>
-**The Data Science Process**
-- Problem Statement
-- Data Collection
-- Data Cleaning & EDA
-- Preprocessing & Modeling
-- Evaluation and Conceptual Understanding
-- Conclusion and Recommendations
+My first idea to improve the model from here in the future would be to acquire more data. I would either do this by getting more posts, or by including the comment text for each of the posts that I analyzed for this modeling process.
 
-**Organization and Professionalism**
-- Organization
-- Visualizations
-- Python Syntax and Control Flow
-- Presentation
+As is reflected in my hypotheses, I think it is reasonable that there would be some amount of bias in any model classifying posts between these subreddits. Both subreddits contain a fair amount of similar conversation about music and concerts in general that don't necessarily specifically pertain to either band. Also, both message boards contain a lot of conversation pertaining to the other band. Phish and the Grateful Dead share a lot of fans, and there is a lot of discussion about both bands in both subreddits. At the same time, getting more data would allow the model to have a better sense of all of the band-specific language like band member names, song/album titles, etc.
 
-**Scores will be out of 30 points based on the 10 categories in the rubric.** <br>
-*3 points per section*<br>
+Interestingly, some of the top buzzwords for each band were common words in both subreddits. Since there is a lot of crossover discussion between the forums, "Phish" and "Dead" are words that, while especially likely to occur in their respective subreddits, are also fairly likely to appear in the other subreddit. This means that simply having a "buzzword" is not enough to correctly classify each post. This would likely be a factor in many of the misclassifications.
 
-| Score | Interpretation |
-| --- | --- |
-| **0** | *Project fails to meet the outlined expectations; many major issues exist.* |
-| **1** | *Project close to meeting expectations; many minor issues or a few major issues.* |
-| **2** | *Project meets expectations; few (and relatively minor) mistakes.* |
-| **3** | *Project demonstrates a thorough understanding of all of the considerations outlined.* |
+It would be interesting to repeat this exercise with two other subreddits of bands that were not as closely linked in terms of their fanbases. It would also be interesting to repeat the exercise on two non-music subreddits. I wonder how the accuracy would compare and if the same kind of model would emerge as the best one.
 
+Another idea that I have is that it might be possible to build a buzzword library that includes any band member names, song titles, and album titles. This might be basically accomplished simply by using larger datasets, but it also wouldn't be that hard to generate such a list manually. In any case, I wonder how a model like that would perform that only considered band-specific language. Of course, it would be basically guessing on posts that were vague, and it would still be susceptible to incorrectly classifying crossover posts, but maybe it would perform well overall. When I was scanning through the lists of wordcounts for each subreddit, I was noticing that most of the top words were all general language and not key terminology or buzzwords. I was expecting there to be more of a concentration of band-specific buzzwords at the top of the list, but that wasn't exactly the case.
 
-### The Data Science Process
-
-**Problem Statement** 
-- Is it clear what the goal of the project is?
-- What type of model will be developed?
-- How will success be evaluated?
-- Is the scope of the project appropriate?
-- Is it clear who cares about this or why this is important to investigate?
-- Does the student consider the audience and the primary and secondary stakeholders?
-
-**Data Collection** 
-- Was enough data gathered to generate a significant result?
-- Was data collected that was useful and relevant to the project?
-- Was data collection and storage optimized through custom functions, pipelines, and/or automation?
-- Was thought given to the server receiving the requests such as considering number of requests per second?
-
-**Data Cleaning and EDA** 
-- Are missing values imputed/handled appropriately?
-- Are distributions examined and described?
-- Are outliers identified and addressed?
-- Are appropriate summary statistics provided?
-- Are steps taken during data cleaning and EDA framed appropriately?
-- Does the student address whether or not they are likely to be able to answer their problem statement with the provided data given what they've discovered during EDA?
-
-**Preprocessing and Modeling** 
-- Is text data successfully converted to a matrix representation?
-- Are methods such as stop words, stemming, and lemmatization explored?
-- Does the student properly split and/or sample the data for validation/training purposes?
-- Does the student test and evaluate a variety of models to identify a production algorithm (**AT MINIMUM:** Bayes and one other model)?
-- Does the student defend their choice of production model relevant to the data at hand and the problem?
-- Does the student explain how the model works and evaluate its performance successes/downfalls?
-
-**Evaluation and Conceptual Understanding** 
-- Does the student accurately identify and explain the baseline score?
-- Does the student select and use metrics relevant to the problem objective?
-- Does the student interpret the results of their model for purposes of inference?
-- Is domain knowledge demonstrated when interpreting results?
-- Does the student provide appropriate interpretation with regards to descriptive and inferential statistics?
-
-**Conclusion and Recommendations** 
-- Does the student provide appropriate context to connect individual steps back to the overall project?
-- Is it clear how the final recommendations were reached?
-- Are the conclusions/recommendations clearly stated?
-- Does the conclusion answer the original problem statement?
-- Does the student address how findings of this research can be applied for the benefit of stakeholders?
-- Are future steps to move the project forward identified?
-
-
-### Organization and Professionalism
-
-**Project Organization**
-- Are modules imported correctly (using appropriate aliases)?
-- Are data imported/saved using relative paths?
-- Does the README provide a good executive summary of the project?
-- Is markdown formatting used appropriately to structure notebooks?
-- Are there an appropriate amount of comments to support the code?
-- Are files & directories organized correctly?
-- Are there unnecessary files included?
-- Do files and directories have well-structured, appropriate, consistent names?
-
-**Visualizations**
-- Are sufficient visualizations provided?
-- Do plots accurately demonstrate valid relationships?
-- Are plots labeled properly?
-- Are plots interpreted appropriately?
-- Are plots formatted and scaled appropriately for inclusion in a notebook-based technical report?
-
-**Python Syntax and Control Flow**
-- Is care taken to write human readable code?
-- Is the code syntactically correct (no runtime errors)?
-- Does the code generate desired results (logically correct)?
-- Does the code follows general best practices and style guidelines?
-- Are Pandas functions used appropriately?
-- Are `sklearn` and `NLTK` methods used appropriately?
-
-**Presentation**
-- Is the problem statement clearly presented?
-- Does a strong narrative run through the presentation building toward a final conclusion?
-- Are the conclusions/recommendations clearly stated?
-- Is the level of technicality appropriate for the intended audience?
-- Is the student substantially over or under time?
-- Does the student appropriately pace their presentation?
-- Does the student deliver their message with clarity and volume?
-- Are appropriate visualizations generated for the intended audience?
-- Are visualizations necessary and useful for supporting conclusions/explaining findings?
-
-
----
-
-### Why we choose this project for you?
-This project covers three of the biggest concepts we cover in the class: Classification Modeling, Natural Language Processing and Data Wrangling/Acquisition.
-
-Part 1 of the project focuses on **Data wrangling/gathering/acquisition**. This is a very important skill as not all the data you will need will be in clean CSVs or a single table in SQL.  There is a good chance that wherever you land you will have to gather some data from some unstructured/semi-structured sources; when possible, requesting information from an API, but often scraping it because they don't have an API (or it's terribly documented).
-
-Part 2 of the project focuses on **Natural Language Processing** and converting standard text data (like Titles and Comments) into a format that allows us to analyze it and use it in modeling.
-
-Part 3 of the project focuses on **Classification Modeling**.  Given that project 2 was a regression focused problem, we needed to give you a classification focused problem to practice the various models, means of assessment and preprocessing associated with classification.   
+Anyway, this project was a good introduction to NLP and some of the various models that can be used for NLP analysis.
